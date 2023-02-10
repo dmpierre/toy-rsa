@@ -17,8 +17,8 @@ pub fn inverse_mod(a: u128, n: u128) -> Result<u128, &'static str> {
         t if t < 0 => {
             let t: u128 = t.try_into().unwrap();
             Ok(t + n)
-        },
-        _ => Ok(t.try_into().unwrap())
+        }
+        _ => Ok(t.try_into().unwrap()),
     }
 }
 
@@ -40,7 +40,19 @@ pub fn pow_mod(m: u128, pow: u128, n: u128) -> u128 {
 }
 
 fn main() {
-    let result = pow_mod(920, 17, 2773);
-    let inverse = inverse_mod(17, 2668).unwrap();
-    println!("{result} {inverse}");
+
+    let (p, q, d) = (47, 59, 157);
+    let n = p * q;
+    let phi_pq = (p - 1) * (q - 1);
+
+    // 'ITS' encoded as in RSA (1977) paper, p.10
+    let m = 920;
+
+    let e = inverse_mod(d, phi_pq).unwrap();
+    let encrypted = pow_mod(m, e, n);
+    let decrypted = pow_mod(encrypted, d, n);
+
+    // D(E(M)) == M
+    assert_eq!(encrypted, 948);
+    assert_eq!(decrypted, m);
 }
